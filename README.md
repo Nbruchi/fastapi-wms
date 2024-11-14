@@ -1,0 +1,1 @@
+# FastAPI Waste Management System

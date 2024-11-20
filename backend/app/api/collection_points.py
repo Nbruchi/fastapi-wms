@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from sqlalchemy import exists
-from sqlalchemy.future import select
-from app.db.models import (CollectionPointCreate,CollectionPointUpdate,CollectionPointInDb, LogEntry)
+from sqlalchemy import select,delete
+from app.db.models import (CollectionPoint, CollectionPointCreate,CollectionPointUpdate,CollectionPointInDb, LogEntry)
 
 collection_points_router = APIRouter(prefix="/collection-points")
 
@@ -78,7 +78,8 @@ async def delete_collection_point(collection_point_id: int,db: AsyncSession = De
 @collection_points_router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_collection_points(db: AsyncSession = Depends(get_db)):
     try:
-        await db.query(CollectionPointInDb).delete()
+        statement = delete(CollectionPoint)
+        await db.execute(statement)
         await db.commit()
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Failed to delete all collection points: {str(e)}")

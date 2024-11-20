@@ -1,7 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException,status
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db,entity_exists
-from app.db.models import (CollectionScheduleCreate,CollectionScheduleUpdate,CollectionScheduleInDb,CollectionPointInDb, LogEntry,WasteTypeInDb)
+from app.db.models import (
+    CollectionSchedule, 
+    CollectionScheduleCreate,
+    CollectionScheduleUpdate,
+    CollectionScheduleInDb,
+    CollectionPointInDb, 
+    LogEntry,
+    WasteTypeInDb
+)
 
 collection_schedules_router = APIRouter(prefix="/collection-schedules")
 
@@ -87,7 +96,7 @@ async def delete_collection_schedule(collection_schedule_id: int,db: AsyncSessio
 @collection_schedules_router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_collection_schedules(db: AsyncSession = Depends(get_db)):
     try:
-        await db.query(CollectionScheduleInDb).delete()
+        await db.execute(delete(CollectionSchedule))
         await db.commit()
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Failed to delete all collection schedules: {str(e)}")

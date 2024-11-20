@@ -1,7 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete
 from app.db.database import get_db,entity_exists
-from app.db.models import (CollectionRecordCreate,CollectionRecordUpdate,CollectionRecordInDb,CollectionScheduleInDb, LogEntry)
+from app.db.models import (
+    CollectionRecordCreate,
+    CollectionRecordUpdate,
+    CollectionRecordInDb,
+    CollectionScheduleInDb,
+    LogEntry,
+    CollectionRecord
+)
 
 collection_records_router = APIRouter(prefix="/collection-records")
 
@@ -77,7 +85,8 @@ async def delete_collection_record(collection_record_id: int,db: AsyncSession = 
 @collection_records_router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_collection_records(db: AsyncSession = Depends(get_db)):
     try:
-        await db.query(CollectionRecordInDb).delete()
+        statement = delete(CollectionRecord)
+        await db.execute(statement)
         await db.commit()
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Failed to delete all collection records: {str(e)}")

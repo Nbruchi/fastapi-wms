@@ -3,12 +3,15 @@ from app.api.waste_types import waste_types_router
 from app.api.collection_points import collection_points_router
 from app.api.collection_schedules import collection_schedules_router
 from app.api.collection_records import collection_records_router
+from app.api.users import users_router
 
 app = FastAPI()
-app.include_router(waste_types_router,prefix="/waste-types")
-app.include_router(collection_points_router,prefix="/collection-points")
-app.include_router(collection_schedules_router,prefix="/collection-schedules")
-app.include_router(collection_records_router,prefix="/collection-records")
+
+app.include_router(users_router)
+app.include_router(waste_types_router)
+app.include_router(collection_points_router)
+app.include_router(collection_schedules_router)
+app.include_router(collection_records_router)
 
 if __name__ == "__main__":
     import uvicorn

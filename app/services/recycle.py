@@ -23,17 +23,26 @@ async def create_recycle(db: AsyncSession, recycle: RecycleCreate):
     return db_recycle
 
 
+
 async def get_recycles(db: AsyncSession):
     # Execute the query with offset and limit
     result = await db.execute(select(Recycle))
     recycles = result.scalars().all()
-
     return [RecycleOut.model_validate(recycle) for recycle in recycles]
+
+
+
+async def get_paginated_recycles(db: AsyncSession, skip: int = 0, limit: int = 50) -> dict:
+   result = await db.execute(select(Recycle).offset(skip).limit(limit))
+   recycles = result.scalars().all()
+   return [RecycleOut.model_validate(recycle) for recycle in recycles]
+
 
 
 async def get_recycle(db: AsyncSession, recycle_id: UUID):
     result = await db.execute(select(Recycle).filter(Recycle.id == recycle_id))
     return result.scalar_one_or_none()
+
 
 
 async def update_recycle(db: AsyncSession, recycle_id: UUID, recycle_update: RecycleUpdate):
@@ -59,6 +68,8 @@ async def update_recycle(db: AsyncSession, recycle_id: UUID, recycle_update: Rec
     await db.commit()
     await db.refresh(db_recycle)
     return db_recycle
+
+
 
 async def delete_recycle(db: AsyncSession, recycle_id: UUID):
     db_recycle = await get_recycle(db, recycle_id)
